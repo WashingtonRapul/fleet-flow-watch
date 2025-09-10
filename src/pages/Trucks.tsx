@@ -11,22 +11,23 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Plus, Edit, Trash2, Truck } from 'lucide-react';
-import type { Truck as TruckType } from '@/types/database';
+import type { Truck as TruckData, TruckType } from '@/types/database';
 
 export default function Trucks() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingTruck, setEditingTruck] = useState<TruckType | null>(null);
+  const [editingTruck, setEditingTruck] = useState<TruckData | null>(null);
   
   const [formData, setFormData] = useState({
     truck_number: '',
+    truck_type: '' as TruckType | '',
     capacity: '',
     status: 'active' as 'active' | 'inactive',
   });
 
   // Fetch trucks
-  const { data: trucks = [], isLoading } = useQuery<TruckType[]>({
+  const { data: trucks = [], isLoading } = useQuery<TruckData[]>({
     queryKey: ['trucks'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -40,7 +41,7 @@ export default function Trucks() {
 
   // Create/Update mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: { truck_number: string; capacity: number | null; status: 'active' | 'inactive' }) => {
+    mutationFn: async (data: { truck_number: string; truck_type: TruckType; capacity: number | null; status: 'active' | 'inactive' }) => {
       if (editingTruck) {
         const { error } = await supabase
           .from('trucks')
@@ -96,11 +97,12 @@ export default function Trucks() {
     },
   });
 
-  const handleOpenDialog = (truck?: TruckType) => {
+  const handleOpenDialog = (truck?: TruckData) => {
     if (truck) {
       setEditingTruck(truck);
       setFormData({
         truck_number: truck.truck_number,
+        truck_type: truck.truck_type,
         capacity: truck.capacity?.toString() || '',
         status: truck.status,
       });
@@ -108,6 +110,7 @@ export default function Trucks() {
       setEditingTruck(null);
       setFormData({
         truck_number: '',
+        truck_type: '' as TruckType | '',
         capacity: '',
         status: 'active',
       });
@@ -120,6 +123,7 @@ export default function Trucks() {
     setEditingTruck(null);
     setFormData({
       truck_number: '',
+      truck_type: '' as TruckType | '',
       capacity: '',
       status: 'active',
     });

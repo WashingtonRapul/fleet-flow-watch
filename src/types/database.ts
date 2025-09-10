@@ -1,10 +1,15 @@
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user' | 'pending';
 export type StatusType = 'active' | 'inactive';
+export type TruckType = 'tipper' | 'flatbed' | 'tanker' | 'container' | 'other';
+export type LocationType = 'warehouse' | 'site-a' | 'site-b' | 'site-c' | 'headquarters' | 'other';
 
 export interface Profile {
   id: string;
   role: UserRole;
   full_name: string | null;
+  is_approved: boolean;
+  approved_by: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -12,6 +17,7 @@ export interface Profile {
 export interface Truck {
   truck_id: string;
   truck_number: string;
+  truck_type: TruckType;
   capacity: number | null;
   status: StatusType;
   created_at: string;
@@ -48,6 +54,7 @@ export interface FuelTransaction {
   transaction_id: string;
   date: string;
   voucher_no: string;
+  location: LocationType;
   truck_id: string | null;
   driver_id: string | null;
   customer_id: string | null;

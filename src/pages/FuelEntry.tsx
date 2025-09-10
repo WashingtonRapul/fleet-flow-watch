@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Save, Calculator } from 'lucide-react';
 import { format } from 'date-fns';
+import type { LocationType } from '@/types/database';
 
 export default function FuelEntry() {
   const { toast } = useToast();
@@ -19,6 +20,7 @@ export default function FuelEntry() {
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
     voucher_no: '',
+    location: '' as LocationType | '',
     truck_id: '',
     driver_id: '',
     customer_id: '',
@@ -134,6 +136,7 @@ export default function FuelEntry() {
       setFormData({
         date: format(new Date(), 'yyyy-MM-dd'),
         voucher_no: '',
+        location: '' as LocationType | '',
         truck_id: '',
         driver_id: '',
         customer_id: '',
@@ -179,6 +182,7 @@ export default function FuelEntry() {
 
     const submissionData = {
       ...formData,
+      location: formData.location as LocationType,
       opening_pump: parseFloat(formData.opening_pump),
       closing_pump: parseFloat(formData.closing_pump),
       diesel_purchased: parseFloat(formData.diesel_purchased),
@@ -225,7 +229,7 @@ export default function FuelEntry() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Basic Information */}
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
                   <Input
@@ -246,6 +250,30 @@ export default function FuelEntry() {
                     placeholder="Enter voucher number"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Location and Vehicle Selection */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Select
+                    value={formData.location}
+                    onValueChange={(value) => setFormData({ ...formData, location: value as LocationType })}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="warehouse">Warehouse</SelectItem>
+                      <SelectItem value="site-a">Site A</SelectItem>
+                      <SelectItem value="site-b">Site B</SelectItem>
+                      <SelectItem value="site-c">Site C</SelectItem>
+                      <SelectItem value="headquarters">Headquarters</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
