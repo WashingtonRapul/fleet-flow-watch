@@ -11,7 +11,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Save, Calculator } from 'lucide-react';
 import { format } from 'date-fns';
-import type { LocationType } from '@/types/database';
+import { ExcelImportExport } from '@/components/fuel/ExcelImportExport';
+import type { LocationType, FuelTransaction } from '@/types/database';
 
 export default function FuelEntry() {
   const { toast } = useToast();
@@ -110,6 +111,20 @@ export default function FuelEntry() {
     },
   });
 
+  // Fetch recent transactions for export
+  const { data: recentTransactions = [] } = useQuery<FuelTransaction[]>({
+    queryKey: ['recent-transactions-export'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('fuel_transactions')
+        .select('*')
+        .order('date', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   // Submit mutation
   const submitMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -196,6 +211,65 @@ export default function FuelEntry() {
     submitMutation.mutate(submissionData);
   };
 
+  // Handle bulk import from Excel
+  const handleBulkImport = async (importedData: Partial<FuelTransaction>[]) => {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      
+      // Process each imported row
+      for (const row of importedData) {
+        const submissionData = {
+          ...row,
+          created_by: user.user?.id,
+          // Calculate derived fields
+          litres_issued: row.closing_pump && row.opening_pump 
+            ? row.closing_pump - row.opening_pump 
+            : 0,
+          km_covered: row.current_km && row.previous_km 
+            ? row.current_km - row.previous_km 
+            : 0,
+          consumption_rate: row.current_km && row.previous_km && row.closing_pump && row.opening_pump
+            ? (row.closing_pump - row.opening_pump) / (row.current_km - row.previous_km)
+            : 0,
+          balance: (row.previous_balance || 0) + (row.diesel_purchased || 0) - 
+                   ((row.closing_pump || 0) - (row.opening_pump || 0)),
+          variance: row.budgeted_rate && row.current_km && row.previous_km && row.closing_pump && row.opening_pump
+            ? ((row.closing_pump - row.opening_pump) / (row.current_km - row.previous_km)) - row.budgeted_rate
+            : null,
+        };
+        
+        const { error } = await supabase
+          .from('fuel_transactions')
+          .insert(submissionData as any);
+        
+        if (error) {
+          console.error('Error importing row:', error);
+          toast({
+            title: 'Import Warning',
+            description: `Failed to import row with voucher ${row.voucher_no}`,
+            variant: 'destructive',
+          });
+        }
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions-export'] });
+      queryClient.invalidateQueries({ queryKey: ['last-transaction'] });
+      
+      toast({
+        title: 'Import Complete',
+        description: `Successfully imported ${importedData.length} fuel entries`,
+      });
+    } catch (error) {
+      console.error('Bulk import error:', error);
+      toast({
+        title: 'Import Failed',
+        description: 'Failed to import fuel entries',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Calculated values
   const litresIssued = formData.closing_pump && formData.opening_pump 
     ? (parseFloat(formData.closing_pump) - parseFloat(formData.opening_pump)).toFixed(2)
@@ -212,11 +286,17 @@ export default function FuelEntry() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fuel Entry</h1>
-          <p className="text-muted-foreground">
-            Record new fuel transactions
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Fuel Entry</h1>
+            <p className="text-muted-foreground">
+              Record new fuel transactions
+            </p>
+          </div>
+          <ExcelImportExport 
+            onImport={handleBulkImport}
+            exportData={recentTransactions}
+          />
         </div>
 
         <form onSubmit={handleSubmit}>

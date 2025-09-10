@@ -38,7 +38,7 @@ export default function UsersPage() {
           role: 'user',
           approved_by: currentUser.user?.id,
           approved_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', userId);
       if (error) throw error;
     },
@@ -63,7 +63,7 @@ export default function UsersPage() {
     mutationFn: async (userId: string) => {
       const { error } = await supabase
         .from('profiles')
-        .update({ is_approved: false, role: 'pending' })
+        .update({ is_approved: false, role: 'pending' } as any)
         .eq('id', userId);
       if (error) throw error;
     },
@@ -194,7 +194,7 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="success">Active</Badge>
+                      <Badge variant="outline" className="bg-success/10 text-success border-success/20">Active</Badge>
                     </TableCell>
                     <TableCell>
                       {user.approved_at 

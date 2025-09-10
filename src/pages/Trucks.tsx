@@ -134,6 +134,7 @@ export default function Trucks() {
     
     const submissionData = {
       truck_number: formData.truck_number,
+      truck_type: formData.truck_type as TruckType,
       capacity: formData.capacity ? parseFloat(formData.capacity) : null,
       status: formData.status,
     };
@@ -188,6 +189,7 @@ export default function Trucks() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Truck Number</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Capacity (L)</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -197,6 +199,7 @@ export default function Trucks() {
                   {trucks.map((truck) => (
                     <TableRow key={truck.truck_id}>
                       <TableCell className="font-medium">{truck.truck_number}</TableCell>
+                      <TableCell className="capitalize">{truck.truck_type?.replace('-', ' ') || '-'}</TableCell>
                       <TableCell>{truck.capacity || '-'}</TableCell>
                       <TableCell>
                         <span className={cn(
@@ -254,6 +257,28 @@ export default function Trucks() {
                     placeholder="e.g., TRK-001"
                     required
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="truck_type">Truck Type</Label>
+                  <Select
+                    value={formData.truck_type}
+                    onValueChange={(value: TruckType) => 
+                      setFormData({ ...formData, truck_type: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select truck type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tipper">Tipper</SelectItem>
+                      <SelectItem value="flatbed">Flatbed</SelectItem>
+                      <SelectItem value="tanker">Tanker</SelectItem>
+                      <SelectItem value="container">Container</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
