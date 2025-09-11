@@ -45,13 +45,25 @@ export default function Trucks() {
       if (editingTruck) {
         const { error } = await supabase
           .from('trucks')
-          .update(data as never)
-          .eq('truck_id', editingTruck.truck_id);
+          .update({
+            truck_number: data.truck_number,
+            truck_type: data.truck_type,
+            capacity: data.capacity,
+            status: data.status,
+          })
+          .eq('truck_id', editingTruck.truck_id)
+          .single();
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('trucks')
-          .insert(data as any);
+          .insert({
+            truck_number: data.truck_number,
+            truck_type: data.truck_type,
+            capacity: data.capacity,
+            status: data.status,
+          })
+          .single();
         if (error) throw error;
       }
     },

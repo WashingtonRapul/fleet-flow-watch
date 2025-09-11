@@ -37,6 +37,7 @@ export interface Database {
         Row: {
           truck_id: string
           truck_number: string
+          truck_type: 'tipper' | 'flatbed' | 'tanker' | 'container' | 'other'
           capacity: number | null
           status: 'active' | 'inactive'
           created_at: string
@@ -44,11 +45,13 @@ export interface Database {
         }
         Insert: {
           truck_number: string
+          truck_type: 'tipper' | 'flatbed' | 'tanker' | 'container' | 'other'
           capacity?: number | null
           status?: 'active' | 'inactive'
         }
         Update: {
           truck_number?: string
+          truck_type?: 'tipper' | 'flatbed' | 'tanker' | 'container' | 'other'
           capacity?: number | null
           status?: 'active' | 'inactive'
         }
@@ -115,6 +118,7 @@ export interface Database {
           transaction_id: string
           date: string
           voucher_no: string
+          location: 'warehouse' | 'site-a' | 'site-b' | 'site-c' | 'headquarters' | 'other'
           truck_id: string | null
           driver_id: string | null
           customer_id: string | null
@@ -140,6 +144,7 @@ export interface Database {
         Insert: {
           date: string
           voucher_no: string
+          location: 'warehouse' | 'site-a' | 'site-b' | 'site-c' | 'headquarters' | 'other'
           truck_id?: string | null
           driver_id?: string | null
           customer_id?: string | null
@@ -156,6 +161,7 @@ export interface Database {
         Update: {
           date?: string
           voucher_no?: string
+          location?: 'warehouse' | 'site-a' | 'site-b' | 'site-c' | 'headquarters' | 'other'
           truck_id?: string | null
           driver_id?: string | null
           customer_id?: string | null
