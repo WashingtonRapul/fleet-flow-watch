@@ -132,6 +132,15 @@ export default function Trucks() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.truck_type) {
+      toast({
+        title: 'Error',
+        description: 'Please select a truck type',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     const submissionData = {
       truck_number: formData.truck_number,
       truck_type: formData.truck_type as TruckType,
