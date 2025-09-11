@@ -30,7 +30,7 @@ export default function Trucks() {
   const { data: trucks = [], isLoading } = useQuery<TruckData[]>({
     queryKey: ['trucks'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('trucks')
         .select('*')
         .order('truck_number');
