@@ -43,7 +43,7 @@ export default function Trucks() {
   const saveMutation = useMutation({
     mutationFn: async (data: { truck_number: string; truck_type: TruckType; capacity: number | null; status: 'active' | 'inactive' }) => {
       if (editingTruck) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('trucks')
           .update({
             truck_number: data.truck_number,
@@ -51,19 +51,17 @@ export default function Trucks() {
             capacity: data.capacity,
             status: data.status,
           })
-          .eq('truck_id', editingTruck.truck_id)
-          .single();
+          .eq('truck_id', editingTruck.truck_id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('trucks')
           .insert({
             truck_number: data.truck_number,
             truck_type: data.truck_type,
             capacity: data.capacity,
             status: data.status,
-          })
-          .single();
+          });
         if (error) throw error;
       }
     },
@@ -87,7 +85,7 @@ export default function Trucks() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (truckId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('trucks')
         .delete()
         .eq('truck_id', truckId);
