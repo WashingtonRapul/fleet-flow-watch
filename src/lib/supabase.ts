@@ -3,8 +3,8 @@ import type { Database } from './database-types';
 
 // For Lovable's native Supabase integration, environment variables are injected differently
 // Using window.location.origin as fallback for development
-const supabaseUrl = 'https://your-project.supabase.co'; // Replace with your Supabase URL
-const supabaseAnonKey = 'your-anon-key'; // Replace with your Supabase anon key
+const supabaseUrl = 'https://iczdqwtiqiyhjwllexbb.supabase.co'; // Replace with your Supabase URL
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljemRxd3RpcWl5aGp3bGxleGJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NDg2MTMsImV4cCI6MjA3MzMyNDYxM30.oEZEFxKMHErHN6uK3ijd2svsXdTLnB7zOdqrsUPqpKQ'; // Replace with your Supabase anon key
 
 // Create a placeholder client that will be replaced when you add your Supabase credentials
 export const supabase = createClient<Database>(
